@@ -164,7 +164,7 @@ output_case_counts <- function(ds){
   # --------------------------- November 2020 ---------------------------------#
   
   message("subjects with at least one serological result (Nov)")
-  Dt2 <- which(ds$Diasorin_qualiitative_november_2020 != "#N/A")
+  Dt2 <- which(ds$Diasorin_qualitative_november_2020 != "#N/A")
   Rt2 <- which(ds$Roche_qualitative_november_2020 != "#N/A")
   At2 <- which(ds$Abbott_qualitative_november_2020 != "#N/A")   
   idx2 <- unique(c(Dt2, Rt2, At2))
@@ -175,7 +175,7 @@ output_case_counts <- function(ds){
   message("number of subjects with known results for all three assays (Nov)")
   
   tab3 <- table(ds$Abbott_qualitative_november_2020, 
-                ds$Diasorin_qualiitative_november_2020, 
+                ds$Diasorin_qualitative_november_2020, 
                 ds$Roche_qualitative_november_2020,
                 useNA = "no")
   
@@ -205,7 +205,7 @@ output_case_counts <- function(ds){
   message("subjects positive to at least one assay (Nov)") 
   
   y2 <- length(unique(ds$INTERNAL_ID[
-    which(ds$Diasorin_qualiitative_november_2020 == "Positive" | 
+    which(ds$Diasorin_qualitative_november_2020 == "Positive" | 
             ds$Roche_qualitative_november_2020 == "Positive" |
             ds$Abbott_qualitative_november_2020 == "Positive")]))
   

@@ -16,6 +16,8 @@
 library(ggplot2)
 library(wesanderson)
 library(binom)
+library(stringr)
+library(cowplot)
 
 # source scripts
 source("R/functions_descriptive_analysis.R")
@@ -23,9 +25,11 @@ source("R/functions_descriptive_analysis.R")
 # read data 
 ds <- read.csv("data/Vo_serology_data.csv", header = TRUE)
 
-# output dir
-path_figure <- file.path(getwd(), "figures")
-path_table <- file.path(getwd(), "tables")
+# Create output folders -------------------------------------------------------#
+dir_output  <- file.path("tables")
+dir_figures <- file.path("figures")
+dir.create(dir_output,  recursive = TRUE, showWarnings = FALSE)
+dir.create(dir_figures, recursive = TRUE, showWarnings = FALSE)
 
 # Data counts for Figure 1 ----------------------------------------------------#
 
@@ -162,7 +166,7 @@ for(i in 1:length(size)){
   
 }
 
-write.csv(cont_tab, file.path(path_table, "Household_final_size_Vo_baseline.csv"))
+write.csv(cont_tab, file.path(dir_output, "Household_final_size_Vo_baseline.csv"))
 
 # -----------------------------------------------------------------------------#
 
@@ -209,7 +213,7 @@ t <-s +
         axis.text.y.right = element_text(color = "dodgerblue4")) 
 
 # ------------------------------ Figure S3 ------------------------------------#
-ggsave(filename = file.path(path_figure, "Figure_S3.tiff"), 
+ggsave(filename = file.path(dir_figures, "Figure_S3.tiff"), 
         plot = plot_grid(plot_grid(p, t,
                  labels = c('a', 'b'),
                  label_size = 8, 

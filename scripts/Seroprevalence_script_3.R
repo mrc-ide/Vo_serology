@@ -14,6 +14,7 @@
 # load packages 
 library(ggplot2)
 library(binom)
+library(cowplot)
 
 # fix seed 
 set.seed(1)

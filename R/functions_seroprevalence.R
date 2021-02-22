@@ -82,7 +82,7 @@ estimate_performance <- function(x, y){
   performance <- data.frame(sens =c(sens$mean, sens$lower, sens$upper), 
                             spec =c(spec$mean, spec$lower, spec$upper))
   
-  return(list(round(performance, 3)))
+  return(list(round(performance, 6)))
   
 }
 
@@ -174,9 +174,9 @@ estimate_serop_ppv_npv <- function(x, y){
   # extract 2.5 - 97.5 percentiles
   df <- data.frame(
     serop = round(c(seroprev_corr_mean, 
-                    quantile(seroprev_corr, c(0.025, 0.975))), 3), 
-    ppv = round(c(ppv_mean, quantile(ppv, c(0.025, 0.975))), 3), 
-    npv = round(c(npv_mean, quantile(npv, c(0.025, 0.975))), 3))
+                    quantile(seroprev_corr, c(0.025, 0.975))), 6), 
+    ppv = round(c(ppv_mean, quantile(ppv, c(0.025, 0.975))), 6), 
+    npv = round(c(npv_mean, quantile(npv, c(0.025, 0.975))), 6))
   
   return(df)
   
