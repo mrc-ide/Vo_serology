@@ -31,18 +31,57 @@ output_case_counts <- function(ds){
                ds$Roche_Total_qualitative, 
                useNA = "always")
   
-    print(c(tab["Negative", "Negative", "Negative"], 
-          round((tab["Negative", "Negative", "Negative"]/length(idx))*100, 1)))
-   
+  x <- tab["Negative", "Negative", "Negative"]
+  
+  print(c(x, round((x/length(idx))*100, 1)))
+    
+  message("subjects negative to all three assays (inc equivocal DiaSorin, May)") 
+  
+  x <- tab["Negative", "Negative", "Negative"] + 
+         tab["Equivocal", "Negative", "Negative"]
+  
+  print(c(x, round((x/length(idx))*100, 1)))
+    
   # ---------------------------------------------------------------------------#         
   message("subjects negative to at least one assay, NA to others (May)")
   
-  x <- tab["Negative",which(is.na(rownames(tab["Negative",,]))), 
-           which(is.na(colnames(tab["Negative",,])))] + 
-    tab[which(is.na(rownames(tab[,,"Negative"]))),"Negative","Negative"]+
-    tab["Negative",which(is.na(colnames(tab[,,"Negative"]))),"Negative"]
+  x <- tab["Negative",
+           which(is.na(rownames(tab["Negative",,]))), 
+           which(is.na(colnames(tab["Negative",,])))] +
+    
+       tab[which(is.na(rownames(tab[,,"Negative"]))),
+           "Negative",
+           "Negative"]+
+    
+       tab["Negative",
+           which(is.na(colnames(tab[,,"Negative"]))),
+           "Negative"]
   
   print(c(x, round((x/length(idx))*100,1)))
+  
+  message("subjects negative to at least one assay (inc equivocal DiaSorin, May)") 
+  
+  x <- tab["Negative", 
+           which(is.na(rownames(tab["Negative",,]))),
+           which(is.na(colnames(tab["Negative",,])))] + 
+    
+       tab[which(is.na(rownames(tab[,,"Negative"]))),
+           "Negative",
+           "Negative"]+
+    
+       tab["Negative",
+           which(is.na(colnames(tab[,,"Negative"]))),
+           "Negative"]+ 
+    
+       tab["Equivocal",
+        which(is.na(rownames(tab["Negative",,]))), 
+        which(is.na(colnames(tab["Negative",,])))]+
+    
+       tab["Equivocal",
+           which(is.na(colnames(tab[,,"Negative"]))),
+           "Negative"]
+  
+  print(c(x, round((x/length(idx))*100, 1)))
   
   # ---------------------------------------------------------------------------#
   message("subjects positive to at least one assay (May)") 
@@ -119,12 +158,12 @@ output_case_counts <- function(ds){
                     
                     freq = c(tab2["FALSE", "Positive", "Positive", "Positive"],
                              tab2["FALSE", "Positive", "Negative", "Positive"],
-                            tab2["FALSE", "Positive", "Positive", "Negative"],
-                            tab2["FALSE", "Negative", "Positive", "Positive"],
-                            tab2["FALSE", "Positive", "Negative", "Negative"],
-                            tab2["FALSE", "Negative", "Positive", "Negative"],
-                            tab2["FALSE", "Negative", "Negative", "Positive"],
-                            tab2["FALSE", "Negative", "Negative", "Negative"]))
+                             tab2["FALSE", "Positive", "Positive", "Negative"],
+                             tab2["FALSE", "Negative", "Positive", "Positive"],
+                             tab2["FALSE", "Positive", "Negative", "Negative"],
+                             tab2["FALSE", "Negative", "Positive", "Negative"],
+                             tab2["FALSE", "Negative", "Negative", "Positive"],
+                             tab2["FALSE", "Negative", "Negative", "Negative"]))
  
   res_pcr_neg$prob <- round(res_pcr_neg$freq/sum(res_pcr_neg$freq)*100, 1)
   
@@ -213,8 +252,10 @@ output_case_counts <- function(ds){
   
   # ---------------------------------------------------------------------------#
   message("subjects negative to all three assays (Nov)") 
-  print(c(tab3["Negative", "Negative", "Negative"], 
-          round((tab3["Negative", "Negative", "Negative"]/length(idx2))*100, 1)))
+  
+  x <- tab3["Negative", "Negative", "Negative"]
+  
+  print(c(x, round((x/length(idx2))*100, 1)))
   
   # ---------------------------------------------------------------------------#
   message("assay combinations (Nov)") 
