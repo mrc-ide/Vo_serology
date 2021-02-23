@@ -4,22 +4,21 @@
 #                                                                              #
 # Cite as:                                                                     #
 # Dorigatti I et al, SARS-CoV-2 antibody dynamics, within-household            #
-# transmission and the impact of contact tracing from community-wide           # 
-# serological testing in the Italian municipality of Vo'.                      # 
+# transmission and the impact of contact tracing from community-wide           #
+# serological testing in the Italian municipality of Vo'.                      #
 #                                                                              #
 # Description:                                                                 #
-# See README.md                                                                # 
+# See README.md                                                                #
 ################################################################################
 
-# load packages 
-library(binom)
-library(ggplot2)
+cat("\n\n### Running 'scripts/Association_antibody_titres_script_4.R'\n\n")
+
 
 # source scripts
 source("R/functions_association_antibody_titres.R")
 
-# read data 
-ds <- read.csv("data/Vo_serology_data.csv", 
+# read data
+ds <- read.csv("data/Vo_serology_data.csv",
                header = TRUE)
 
 # output dir
@@ -29,10 +28,10 @@ path_table <- file.path(getwd(), "tables")
 # formatting ------------------------------------------------------------------#
 levels(ds$hospitalized)[levels(ds$hospitalized)==""] <- "no"
 
-# BMI 
+# BMI
 ds$BMI <- ds$Weight_kg/(ds$Height_cm/100)^2
 
-# BMI categories 
+# BMI categories
 ds$BMI_category <- NA
 ds$BMI_category[which(ds$BMI < 18.5)] <- "Underweight"
 ds$BMI_category[which(ds$BMI >= 18.5 & ds$BMI< 25)] <- "Normal"
@@ -50,24 +49,24 @@ ds$BMI_category <- factor(ds$BMI_category, levels= c("Underweight",
 levels(ds$Symptomatic_any_time_from_1_january_to_1_may)[
   levels(ds$Symptomatic_any_time_from_1_january_to_1_may) == ""] <- "no"
 
-# select baseline groud truth 
+# select baseline groud truth
 ds <- ds[which(ds$Groundtruth == 1), ]
 
 ################################################################################
 # Logistic regression symptoms vs age + BMI                                    #
 ################################################################################
 
-# symptoms vs age 
+# symptoms vs age
 tab <- table(ds$Symptomatic_any_time_from_1_january_to_1_may, ds$age_group)
 
-confint <- binom.confint(tab[2,], 
-                         colSums(tab), 
-                         conf.level = 0.95, 
+confint <- binom.confint(tab[2,],
+                         colSums(tab),
+                         conf.level = 0.95,
                          methods = "exact")
 
-df <- data.frame(prob = tab[2,]/colSums(tab), 
+df <- data.frame(prob = tab[2,]/colSums(tab),
                  age = colnames(tab),
-                 low = confint$lower, 
+                 low = confint$lower,
                  up = confint$upper)
 
 plot1 <- ggplot(data = df)+
@@ -77,24 +76,24 @@ plot1 <- ggplot(data = df)+
   ylab("probability of being symptomatic")+
   xlab("age groups (years)")
 
-# symptoms vs BMI 
+# symptoms vs BMI
 tab2 <- table(ds$Symptomatic_any_time_from_1_january_to_1_may, ds$BMI_category)
 
-confint2 <- binom.confint(tab2[2,], 
-                          colSums(tab2), 
-                          conf.level = 0.95, 
+confint2 <- binom.confint(tab2[2,],
+                          colSums(tab2),
+                          conf.level = 0.95,
                           methods = "exact")
 
-df2 <- data.frame(prob = tab2[2,]/colSums(tab2), 
+df2 <- data.frame(prob = tab2[2,]/colSums(tab2),
                  bmi = colnames(tab2),
-                 low = confint2$lower, 
+                 low = confint2$lower,
                  up = confint2$upper)
 
 df2 <- df2[-5, ]
 
-df2$bmi <- factor(df2$bmi, 
+df2$bmi <- factor(df2$bmi,
                   levels = c("Underweight",
-                             "Normal", 
+                             "Normal",
                              "Overweight",
                              "Obese"))
 
@@ -110,7 +109,7 @@ ds$age_group <- relevel(ds$age_group, ref = "51-60")
 ds$BMI_category <- relevel(ds$BMI_category, ref = "Normal")
 
 # logistic regression symptoms ~ age
-res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ age_group, 
+res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ age_group,
            data = ds, family = "binomial")
 summary(res)
 confint(res)
@@ -119,7 +118,7 @@ exp(coef(res))
 exp(cbind(OR = coef(res), confint(res)))
 
 # logistic regression symptoms ~ BMI
-res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ BMI_category, 
+res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ BMI_category,
            data = ds, family = "binomial")
 summary(res)
 confint(res)
@@ -128,8 +127,8 @@ exp(coef(res))
 exp(cbind(OR = coef(res), confint(res)))
 
 # logistic regression symptoms ~ age + BMI
-res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ 
-             age_group + BMI_category, 
+res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~
+             age_group + BMI_category,
            data = ds, family = "binomial")
 summary(res)
 confint(res)
@@ -143,16 +142,16 @@ exp(cbind(OR = coef(res), confint(res)))
 
 ds$first_symptoms_date <- as.character(ds$first_symptoms_date)
 
-ds$Abbott_quantitative_november_2020 <- 
+ds$Abbott_quantitative_november_2020 <-
   as.numeric(as.character(ds$Abbott_quantitative_november_2020))
 
-ds$Diasorin_quantitative_november_2020 <- 
+ds$Diasorin_quantitative_november_2020 <-
   as.numeric(as.character(ds$Diasorin_quantitative_november_2020))
 
-ds$Roche_quantitative_november_2020 <- 
+ds$Roche_quantitative_november_2020 <-
   as.numeric(as.character(ds$Roche_quantitative_november_2020))
 
-# Abbott 
+# Abbott
 # May
 var1 <- "Abbot_qualitative"
 var2 <- "Abbot_semiquantitative"
@@ -171,7 +170,7 @@ res[[2]]
 res[[3]]
 res[[4]]
 
-# Diasorin 
+# Diasorin
 # May
 var1 <- "Diasorin_IgG_qualitative"
 var2 <- "Diasorin_IgG_semiquantitative"
@@ -192,7 +191,7 @@ res[[2]]
 res[[3]]
 res[[4]]
 
-# Roche 
+# Roche
 # May
 var1 <- "Roche_Total_qualitative"
 var2 <- "Roche_Total_ICO"
@@ -210,10 +209,10 @@ res[[1]]
 res[[2]]
 
 ################################################################################
-# Antibody titres by symptoms occurrence                                       # 
+# Antibody titres by symptoms occurrence                                       #
 ################################################################################
 
-# Abbott 
+# Abbott
 # May
 var1 <- "Abbot_qualitative"
 var2 <- "Abbot_semiquantitative"
@@ -228,7 +227,7 @@ type <- "symptom occurrence"
 
 (res <- test_antibody_titres(var1, var2, type))
 
-# Diasorin 
+# Diasorin
 # May
 var1 <- "Diasorin_IgG_qualitative"
 var2 <- "Diasorin_IgG_semiquantitative"
@@ -243,7 +242,7 @@ type <- "symptom occurrence"
 
 (res <- test_antibody_titres(var1, var2, type))
 
-# Roche 
+# Roche
 # May
 var1 <- "Roche_Total_qualitative"
 var2 <- "Roche_Total_ICO"
@@ -259,10 +258,10 @@ type <- "symptom occurrence"
 (res <- test_antibody_titres(var1, var2, type))
 
 ################################################################################
-# Antibody titres by hospitalisation status                                    # 
+# Antibody titres by hospitalisation status                                    #
 ################################################################################
 
-# Abbott 
+# Abbott
 # May
 var1 <- "Abbot_qualitative"
 var2 <- "Abbot_semiquantitative"
@@ -277,7 +276,7 @@ type <- "hospitalized"
 
 (res <- test_antibody_titres(var1, var2, type))
 
-# Diasorin 
+# Diasorin
 # May
 var1 <- "Diasorin_IgG_qualitative"
 var2 <- "Diasorin_IgG_semiquantitative"
@@ -292,7 +291,7 @@ type <- "hospitalized"
 
 (res <- test_antibody_titres(var1, var2, type))
 
-# Roche 
+# Roche
 # May
 var1 <- "Roche_Total_qualitative"
 var2 <- "Roche_Total_ICO"
@@ -308,10 +307,10 @@ type <- "hospitalized"
 (res <- test_antibody_titres(var1, var2, type))
 
 ################################################################################
-# Antibody titres by sex                                                       # 
+# Antibody titres by sex                                                       #
 ################################################################################
 
-# Abbott 
+# Abbott
 # May
 var1 <- "Abbot_qualitative"
 var2 <- "Abbot_semiquantitative"
@@ -326,7 +325,7 @@ type <- "sex"
 
 (res <- test_antibody_titres(var1, var2, type))
 
-# Diasorin 
+# Diasorin
 # May
 var1 <- "Diasorin_IgG_qualitative"
 var2 <- "Diasorin_IgG_semiquantitative"
@@ -341,7 +340,7 @@ type <- "sex"
 
 (res <- test_antibody_titres(var1, var2, type))
 
-# Roche 
+# Roche
 # May
 var1 <- "Roche_Total_qualitative"
 var2 <- "Roche_Total_ICO"
@@ -357,10 +356,10 @@ type <- "sex"
 (res <- test_antibody_titres(var1, var2, type))
 
 ################################################################################
-# Antibody titres by age group                                                 # 
+# Antibody titres by age group                                                 #
 ################################################################################
 
-# Abbott 
+# Abbott
 # May
 var1 <- "Abbot_qualitative"
 var2 <- "Abbot_semiquantitative"
@@ -376,7 +375,7 @@ type <- "age group"
 
 (res <- Anova_Kruskal_antibody_titres(var1, var2, type))
 
-# Diasorin 
+# Diasorin
 # May
 var1 <- "Diasorin_IgG_qualitative"
 var2 <- "Diasorin_IgG_semiquantitative"
@@ -392,7 +391,7 @@ type <- "age group"
 
 (res <- Anova_Kruskal_antibody_titres(var1, var2, type))
 
-# Roche 
+# Roche
 # May
 var1 <- "Roche_Total_qualitative"
 var2 <- "Roche_Total_ICO"
@@ -410,10 +409,10 @@ type <- "age group"
 p4 <- res[[4]]
 
 ################################################################################
-# Antibody titres by BMI                                                       # 
+# Antibody titres by BMI                                                       #
 ################################################################################
 
-# Abbott 
+# Abbott
 # May
 var1 <- "Abbot_qualitative"
 var2 <- "Abbot_semiquantitative"
@@ -429,7 +428,7 @@ type <- "BMI category"
 
 (res <- Anova_Kruskal_antibody_titres(var1, var2, type))
 
-# Diasorin 
+# Diasorin
 # May
 var1 <- "Diasorin_IgG_qualitative"
 var2 <- "Diasorin_IgG_semiquantitative"
@@ -445,7 +444,7 @@ type <- "BMI category"
 
 (res <- Anova_Kruskal_antibody_titres(var1, var2, type))
 
-# Roche 
+# Roche
 # May
 var1 <- "Roche_Total_qualitative"
 var2 <- "Roche_Total_ICO"
@@ -462,16 +461,16 @@ type <- "BMI category"
 (res <- Anova_Kruskal_antibody_titres(var1, var2, type))
 
 ################################################################################
-# Multiple linear regression: antibody ~ symptoms + age + BMI                  # 
+# Multiple linear regression: antibody ~ symptoms + age + BMI                  #
 ################################################################################
 
-# Abbott 
-# May 
+# Abbott
+# May
 idx <- which(ds$Abbot_qualitative == "Positive")
 
 df <- data.frame(
-  antibody_titre = ds$Abbot_semiquantitative[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_titre = ds$Abbot_semiquantitative[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -500,8 +499,8 @@ r1 <- ggplot(df[df$symptomatic == "yes", ],aes(y=antibody_titre,
 idx <- which(ds$Abbott_qualitative_november_2020 == "Positive")
 
 df <- data.frame(
-  antibody_titre = ds$Abbott_quantitative_november_2020[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_titre = ds$Abbott_quantitative_november_2020[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -524,13 +523,13 @@ r2 <- ggplot(df[df$symptomatic == "yes",],
   theme(legend.position = c(0.15, 0.85),
         legend.background = element_blank())
 
-# DiaSorin 
-# May 
+# DiaSorin
+# May
 idx <- which(ds$Diasorin_IgG_qualitative == "Positive")
 
 df <- data.frame(
-  antibody_titre = ds$Diasorin_IgG_semiquantitative[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_titre = ds$Diasorin_IgG_semiquantitative[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -556,8 +555,8 @@ r3 <- ggplot(df[df$symptomatic == "yes", ],aes(y=antibody_titre,
 idx <- which(ds$Diasorin_qualitative_november_2020 == "Positive")
 
 df <- data.frame(
-  antibody_titre = ds$Diasorin_quantitative_november_2020[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_titre = ds$Diasorin_quantitative_november_2020[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -570,13 +569,13 @@ summary(fit)
 fit <- lm(antibody_titre ~ BMI , data = df[df$symptomatic == "yes", ])
 summary(fit)
 
-# Roche 
-# May 
+# Roche
+# May
 idx <- which(ds$Roche_Total_qualitative == "Positive")
 
 df <- data.frame(
-  antibody_titre = ds$Roche_Total_ICO[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_titre = ds$Roche_Total_ICO[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -601,8 +600,8 @@ r4 <- ggplot(df[df$symptomatic == "yes", ],aes(y=antibody_titre,
 idx <- which(ds$Roche_qualitative_november_2020 == "Positive")
 
 df <- data.frame(
-  antibody_titre = ds$Roche_quantitative_november_2020[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_titre = ds$Roche_quantitative_november_2020[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -632,7 +631,11 @@ cols12 <- plot_grid(p1, p2, p3, q1, q2, q3,
                     nrow = 2,
                     label_fontface = "bold")
 
+saveRDS(cols12, file = file.path(path_figure, "temp.rds"))
+
+
 # -----------------------------------------------------------------------------#
+
 
 ################################################################################
 ################################################################################

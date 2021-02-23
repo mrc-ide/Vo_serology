@@ -1,28 +1,27 @@
 ################################################################################
-# This code runs the association analysis on antibody decay rates observed     # 
+# This code runs the association analysis on antibody decay rates observed     #
 # between May and November vs age and BMI.                                     #
 #                                                                              #
 # Cite as:                                                                     #
 # Dorigatti I et al, SARS-CoV-2 antibody dynamics, within-household            #
-# transmission and the impact of contact tracing from community-wide           # 
-# serological testing in the Italian municipality of Vo'.                      # 
+# transmission and the impact of contact tracing from community-wide           #
+# serological testing in the Italian municipality of Vo'.                      #
 #                                                                              #
 # Description:                                                                 #
-# See README.md                                                                # 
+# See README.md                                                                #
 ################################################################################
 
-# load packages 
-library(binom)
-library(ggplot2)
- 
-# set seed for bootstrapping 
+cat("\n\n### Running 'scripts/Association_antibody_decay_script_5.R'\n\n")
+
+
+# set seed for bootstrapping
 set.seed(1)
 
 # source scripts
 source("R/functions_association_antibody_slopes.R")
 
-# read data 
-ds <- read.csv("data/Vo_serology_data.csv", 
+# read data
+ds <- read.csv("data/Vo_serology_data.csv",
                header = TRUE)
 
 # output dir
@@ -32,22 +31,22 @@ path_table <- file.path(getwd(), "tables")
 # formatting ------------------------------------------------------------------#
 
 ds$first_symptoms_date <- as.character(ds$first_symptoms_date)
- 
-ds$Abbott_quantitative_november_2020 <- 
+
+ds$Abbott_quantitative_november_2020 <-
    as.numeric(as.character(ds$Abbott_quantitative_november_2020))
- 
-ds$Diasorin_quantitative_november_2020 <- 
+
+ds$Diasorin_quantitative_november_2020 <-
   as.numeric(as.character(ds$Diasorin_quantitative_november_2020))
- 
-ds$Roche_quantitative_november_2020 <- 
+
+ds$Roche_quantitative_november_2020 <-
    as.numeric(as.character(ds$Roche_quantitative_november_2020))
 
 levels(ds$hospitalized)[levels(ds$hospitalized)==""] <- "no"
 
-# BMI 
+# BMI
 ds$BMI <- ds$Weight_kg/(ds$Height_cm/100)^2
 
-# BMI categories 
+# BMI categories
 ds$BMI_category <- NA
 ds$BMI_category[which(ds$BMI < 18.5)] <- "Underweight"
 ds$BMI_category[which(ds$BMI >= 18.5 & ds$BMI< 25)] <- "Normal"
@@ -66,15 +65,15 @@ levels(ds$Symptomatic_any_time_from_1_january_to_1_may)[
   levels(ds$Symptomatic_any_time_from_1_january_to_1_may) == ""] <- "no"
 
 
-# select baseline groud truth 
+# select baseline groud truth
 ds <- ds[which(ds$Groundtruth == 1), ]
 
-# number of days between serosurveys 
-days_surveys <- as.numeric(as.Date("11/29/2020", "%m/%d/%Y") - 
+# number of days between serosurveys
+days_surveys <- as.numeric(as.Date("11/29/2020", "%m/%d/%Y") -
   as.Date("05/01/2020", "%m/%d/%Y"))
 
 ################################################################################
-# Decay rate                                                                   # 
+# Decay rate                                                                   #
 ################################################################################
 
 ds$slope_Abbott <- log(ds$Abbott_quantitative_november_2020/
@@ -87,27 +86,27 @@ ds$slope_Roche <- log(ds$Roche_quantitative_november_2020/
                         ds$Roche_Total_ICO)/days_surveys
 
 ################################################################################
-# Half life                                                                    # 
+# Half life                                                                    #
 ################################################################################
 
 ds$hl_Abbott <- log(0.5)/ds$slope_Abbott
 ds$hl_Diasorin <- log(0.5)/ds$slope_Diasorin
 ds$hl_Roche <- log(0.5)/ds$slope_Roche
 
-# Abbott 
+# Abbott
 compute_half_life(ds, "Abbott")
 bootstrap_hl(ds, "Abbott")
 
-# DiaSorin 
+# DiaSorin
 compute_half_life(ds, "DiaSorin")
 bootstrap_hl(ds, "DiaSorin")
 
-# Roche 
+# Roche
 compute_half_life(ds, "Roche")
 bootstrap_hl(ds, "Roche")
 
 ################################################################################
-# Decay rate vs symptoms                                                       # 
+# Decay rate vs symptoms                                                       #
 ################################################################################
 
 # Abbott
@@ -126,7 +125,7 @@ type2 <- "decay rate"
 
 (res <- test_decay_rate_half_life(var1, var2, type, type2))
 
-# Roche 
+# Roche
 var1 <- "Roche_Total_qualitative"
 var2 <- "slope_Roche"
 type <- "symptom occurrence"
@@ -135,7 +134,7 @@ type2 <- "decay rate"
 (res <- test_decay_rate_half_life(var1, var2, type, type2))
 
 ################################################################################
-# Decay rate vs hospitalisation                                                # 
+# Decay rate vs hospitalisation                                                #
 ################################################################################
 
 # Abbott
@@ -154,7 +153,7 @@ type2 <- "decay rate"
 
 (res <- test_decay_rate_half_life(var1, var2, type, type2))
 
-# Roche 
+# Roche
 var1 <- "Roche_Total_qualitative"
 var2 <- "slope_Roche"
 type <- "hospitalized"
@@ -163,7 +162,7 @@ type2 <- "decay rate"
 (res <- test_decay_rate_half_life(var1, var2, type, type2))
 
 ################################################################################
-# Decay rate vs sex                                                            # 
+# Decay rate vs sex                                                            #
 ################################################################################
 
 # Abbott
@@ -182,7 +181,7 @@ type2 <- "decay rate"
 
 (res <- test_decay_rate_half_life(var1, var2, type, type2))
 
-# Roche 
+# Roche
 var1 <- "Roche_Total_qualitative"
 var2 <- "slope_Roche"
 type <- "sex"
@@ -191,7 +190,7 @@ type2 <- "decay rate"
 (res <- test_decay_rate_half_life(var1, var2, type, type2))
 
 ################################################################################
-# Decay rate vs age group                                                      # 
+# Decay rate vs age group                                                      #
 ################################################################################
 
 # Abbott
@@ -223,7 +222,7 @@ type2 <- "decay rate"
 p3 <- res[[4]]
 
 ################################################################################
-# Decay rate vs BMI category                                                   # 
+# Decay rate vs BMI category                                                   #
 ################################################################################
 
 # Abbott
@@ -254,15 +253,15 @@ type2 <- "decay rate"
 q3 <- res[[4]]
 
 ################################################################################
-# Multiple linear regression: decay ~ symptoms + age + BMI                  # 
+# Multiple linear regression: decay ~ symptoms + age + BMI                  #
 ################################################################################
 
-# Abbott 
+# Abbott
 idx <- which(ds$Abbot_qualitative == "Positive")
 
 df <- data.frame(
-  antibody_slope = ds$slope_Abbott[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_slope = ds$slope_Abbott[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -282,8 +281,8 @@ summary(fit)
 idx <- which(ds$Diasorin_IgG_qualitative == "Positive")
 
 df <- data.frame(
-  antibody_slope = ds$slope_Diasorin[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_slope = ds$slope_Diasorin[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -303,8 +302,8 @@ summary(fit)
 idx <- which(ds$Roche_Total_qualitative == "Positive")
 
 df <- data.frame(
-  antibody_slope = ds$slope_Roche[idx], 
-  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]), 
+  antibody_slope = ds$slope_Roche[idx],
+  symptomatic = as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may[idx]),
   age_group = as.factor(ds$age_group[idx]),
   BMI = ds$BMI[idx])
 
@@ -331,6 +330,7 @@ r3 <- ggplot(df[df$symptomatic == "yes", ],aes(y=antibody_slope,
 
 # Figure S2 -------------------------------------------------------------------#
 
+cols12 <- readRDS(file.path(path_figure, "temp.rds"))
 col3 <- plot_grid(p1, p2, p3,
           labels = c('g', 'h', 'i'),
           label_size = 8,
