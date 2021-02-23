@@ -13,17 +13,22 @@
 # Load packages ---------------------------------------------------------------#
 
 library(binom)
+library(car)
 library(cowplot)
 library(data.table)
+library(dplyr)
 library(gdata)
 library(ggplot2)
+library(ggrepel)
+library(ggvenn)
 library(grid)
 library(gridExtra)
 library(gtable)
 library(LaplacesDemon)
+library(odin)
 library(stringr)
+library(tidyr)
 library(wesanderson)
-library(car)
 
 
 # Run scripts -----------------------------------------------------------------#
@@ -55,3 +60,5 @@ source("scripts/Fit_2_groups_household_model_script_8.R")
 source("scripts/Plot_DIC_script_9.R")
 
 source("scripts/Plot_SITP_overdisp_fit_original_model_script_10.R")
+
+source("scripts/Impact_of_contact_tracing_11.R")
