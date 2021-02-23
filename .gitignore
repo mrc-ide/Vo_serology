@@ -7,3 +7,4 @@
 *.rds
 figures/
 tables/
+mcmc_posterior_chains*
