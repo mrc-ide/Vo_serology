@@ -12,7 +12,7 @@
 # See README.md                                                                #
 ################################################################################
 
-cat("\n\n### Running 'scripts/Fit_2_groups_household_model_script_8.R'\n\n")
+cat("\n\n### Running 'scripts/Fit_2_groups_household_model_script_8.R' ###\n\n")
 
 
 # source scripts
@@ -97,7 +97,6 @@ single_chains_plots <- FALSE
 
 # set number of chains to run for each model and burnin
 id_chain <- 3
-burnin <- 500
 
 sizes <- seq_len(nrow(par))
 
@@ -118,8 +117,11 @@ sizes <- seq_len(nrow(par))
 # res <- grp$wait(Inf)
 
 # runs locally
-mcmc_par$nbIter <- 1000 # uncomment for a quicker test run
-burnin <- 20
+burnin <- 500
+
+#mcmc_par$nbIter <- 1000 # uncomment for a quicker test run
+#burnin <- 20 # uncomment for a quicker test run
+
 res <- lapply(sizes,
               wrapper_model,
               data                 = data,

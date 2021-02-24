@@ -10,7 +10,7 @@
 # See README.md                                                                #
 ################################################################################
 
-cat("\n\n### Running 'scripts/Plot_DIC_script_9.R'\n\n")
+cat("\n\n### Running 'scripts/Plot_DIC_script_9.R' ###\n\n")
 
 
 # source script ---------------------------------------------------------------#

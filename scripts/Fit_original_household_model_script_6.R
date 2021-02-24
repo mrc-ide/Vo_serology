@@ -12,7 +12,7 @@
 # See README.md                                                                #
 ################################################################################
 
-cat("\n\n### Running 'scripts/Fit_original_household_model_script_6.R'\n\n")
+cat("\n\n### Running 'scripts/Fit_original_household_model_script_6.R' ###\n\n")
 
 
 # source scripts
@@ -115,8 +115,11 @@ sizes <- seq_len(nrow(par))
 # res <- grp$wait(Inf)
 
 # runs locally
-mcmc_par$nbIter <- 1000 # uncomment for a quicker test run
-burnin <- 20
+burnin <- 100
+
+#mcmc_par$nbIter <- 1000 # uncomment for a quicker test run
+#burnin <- 20 # uncomment for a quicker test run
+
 res <- lapply(sizes,
               wrapper_model,
               data                 = data,

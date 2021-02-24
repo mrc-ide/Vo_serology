@@ -13,7 +13,7 @@
 # See README.md                                                                #
 ################################################################################
 
-cat("\n\n### Running 'scripts/Fit_extended_household_model_script_7.R'\n\n")
+cat("\n\n### Running 'scripts/Fit_extended_household_model_script_7.R' ###\n\n")
 
 
 # source scripts
@@ -100,9 +100,8 @@ single_chains_plots <- FALSE
 # set number of chains to run for each model and burnin
 id_chain <- 3
 burnin <- 100
-sizes <- seq(1,2,1)
 
-#sizes <- seq_len(nrow(par))
+sizes <- seq_len(nrow(par))
 
 # # runs on the cluster
 # t <- obj$enqueue(sessionInfo())
@@ -121,8 +120,11 @@ sizes <- seq(1,2,1)
 # res <- grp$wait(Inf)
 
 # runs locally
-mcmc_par$nbIter <- 1000 # uncomment for a quicker test run
-burnin <- 20
+burnin <- 100
+
+#mcmc_par$nbIter <- 1000 # uncomment for a quicker test run
+#burnin <- 20 # uncomment for a quicker test run
+
 res <- lapply(sizes,
               wrapper_model,
               data                 = data,
