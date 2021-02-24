@@ -1,0 +1,1 @@
+./Statistic_forge.py -in ./Contact_tracing_data -GT ./Groundtruth.txt -out ./Contact_tracing_statistics
