@@ -36,6 +36,7 @@ The scripts folder contains the main scripts for each separate analysis
 - `Fit_2_groups_household_model_script_8.R` is the main script to fit a 2-group model to the within-household attack rates observed in Vo'. We use MCMC for parameter inference. This script requires script 1 to be run beforehand. 
 - `Plot_DIC_script_9.R` is the main script to compare the performance of the original, extended and 2-groups within-household transmission models. This script requires scripts 6, 7 and 8 to be run beforehand. 
 - `Plot_SITP_overdisp_fit_original_model_script_10.R` is the main script to output the model fit, the SITP and the overdispersionin the offspring distribution of the best model. This script requires script 6 to be run beforehand. 
+- `Impact_of_contact_tracing_11.R` is the main script to compute the impact of contact tracing on the spread of COVID-19 in Vo' in spring 2020. Under the hood, this script runs a SEIR model that has previously been published (Lavezzo et. al., 2020, Suppression of COVID-19 outbreak in the municipality of Vo, Italy, medRxiv, doi: 10.1101/2020.04.17.20053157). This script is independent of all other scripts.
 
 
 ## R 
@@ -51,6 +52,7 @@ The R folder contains the functions used by the main scripts.
 - `Fit_2_groups_household_model_script_8.R` uses scripts functions_fit_2_groups_model.R and functions_plot_fitted_model.R
 - `Plot_DIC_script_9.R` uses scripts functions_plot_deviance_DIC.R and functions_plot_fitted_model.R
 - `Plot_SITP_overdisp_fit_original_model_script_10.R` uses scripts functions_fit_model.R and functions_plot_fitted_model.R
+- `functions_model_11.R`, `functions_analysis_11.R`, `functions_figures_11.R` contain the definitions of functions employed in the main script Impact_of_contact_tracing_11.R
 
 ## Contact tracing analysis 
 The contact_tracing_analysis folder contains the data and Python code used to estimate the performance of contact tracing. Instructions on how to run the code are given in the file Command_Line_Statistic_forge. 
