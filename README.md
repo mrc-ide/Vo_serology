@@ -52,7 +52,7 @@ The R folder contains the functions used by the main scripts.
 - `Fit_2_groups_household_model_script_8.R` uses scripts functions_fit_2_groups_model.R and functions_plot_fitted_model.R
 - `Plot_DIC_script_9.R` uses scripts functions_plot_deviance_DIC.R and functions_plot_fitted_model.R
 - `Plot_SITP_overdisp_fit_original_model_script_10.R` uses scripts functions_fit_model.R and functions_plot_fitted_model.R
-- `functions_model_11.R`, `functions_analysis_11.R`, `functions_figures_11.R` contain the definitions of functions employed in the main script Impact_of_contact_tracing_11.R
+- `Impact_of_contact_tracing_11.R` depends on functions defined in the files functions_model_11.R, functions_analysis_11.R, functions_figures_11.R
 
 ## Contact tracing analysis 
 The contact_tracing_analysis folder contains the data and Python code used to estimate the performance of contact tracing. Instructions on how to run the code are given in the file Command_Line_Statistic_forge. 
