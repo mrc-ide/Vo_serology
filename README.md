@@ -1,5 +1,5 @@
 Please cite as:
-Dorigatti et. al., SARS-CoV-2 antibody dynamics, within-household transmission and the impact of contact tracing from community-wide serological testing in the Italian municipality of Vo’
+Dorigatti et. al., SARS-CoV-2 antibody dynamics, within-household transmission and the impact of contact tracing from community-wide serological testing in the Italian municipality of Vo’. Available as a pre-print (not peer-reviewed) at SSRN: http://dx.doi.org/10.2139/ssrn.3792892. 
 
 # Repository structure
 This repository contains: 
