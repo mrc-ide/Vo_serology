@@ -25,6 +25,7 @@ library(ggvenn)
 library(grid)
 library(gridExtra)
 library(gtable)
+library(latex2exp)
 library(LaplacesDemon)
 library(odin)
 library(stringr)
@@ -54,16 +55,18 @@ source("scripts/Fit_original_household_model_script_6.R")
 # uncomment lines 125-126 for a quicker test run
 source("scripts/Fit_extended_household_model_script_7.R")
 
-# N.B. this script takes time to run, 
+# N.B. this script takes time to run,
 # uncomment lines 122-123 for a quicker test run
 source("scripts/Fit_2_groups_household_model_script_8.R")
 
-# N.B. make sure to run step 6, 7 and 8 before this step, as this script uses 
+# N.B. make sure to run step 6, 7 and 8 before this step, as this script uses
 # the output from these script
 source("scripts/Plot_DIC_script_9.R")
 
-# N.B. make sure to run step 6 with the original parameterisation, 
-# i.e. with lines 120-121 commented 
+# N.B. make sure to run step 6 with the original parameterisation,
+# i.e. with lines 120-121 commented
 source("scripts/Plot_SITP_overdisp_fit_original_model_script_10.R")
 
+# Produces Figure 1, Figure 6, and Table S9
+# N.B. uncomment lines 45-48 for a quicker test run
 source("scripts/Impact_of_contact_tracing_11.R")

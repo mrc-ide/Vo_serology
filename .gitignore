@@ -7,4 +7,5 @@
 *.rds
 figures/
 tables/
-mcmc_posterior_chains*
+11_impact_of_contact_tracing/
+mcmc_posterior_chains*/
