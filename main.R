@@ -31,6 +31,7 @@ library(odin)
 library(stringr)
 library(tidyr)
 library(wesanderson)
+library(rmdformats)
 
 
 # Run scripts -----------------------------------------------------------------#
@@ -70,3 +71,8 @@ source("scripts/Plot_SITP_overdisp_fit_original_model_script_10.R")
 # Produces Figure 1, Figure 6, and Table S9
 # N.B. uncomment lines 45-48 for a quicker test run
 source("scripts/Impact_of_contact_tracing_11.R")
+
+# Produces Figure S1, Tables S1, S5, S6
+rmarkdown::render("scripts/Complementary_info_Figure_S1_Tables_S5_S6.Rmd",
+                  knit_root_dir = getwd(),
+                  output_dir = "figures")

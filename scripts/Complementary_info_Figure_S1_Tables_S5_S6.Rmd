@@ -1,0 +1,760 @@
+---
+title: "SARS-CoV-2 antibody dynamics, within-household transmission and the impact of contact tracing from community-wide serological testing in the Italian municipality of Vo'"
+author: "Dorigatti I. et al. (2021)"
+date: "12/05/2021"
+output:
+   rmdformats::readthedown:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+---
+
+
+This code outputs complementary info for Figures S1 and Tables S5 and S6.
+
+
+**Load packages**
+```{r, message=FALSE}
+library(boot)
+library(kableExtra)
+library(ppcor)
+library(readxl)
+```
+
+**Read data**
+```{r, warning=FALSE, message=FALSE}
+Vo_serology_data = read_excel("data/Vo_serology_data.xlsx", sheet="Dataset")
+```
+
+
+Figure S1
+=========
+
+*Association among serological and micro-neutralisation assays*
+
+May serosurvey
+--------------
+
+**Extract dataset**
+```{r}
+May_survey = data.frame(Vo_serology_data[,c(269,271,273,275,302)])
+May_survey[May_survey=="NA"] = NA
+May_survey[,4] = as.factor(May_survey[,4])
+May_survey[,4] = factor(May_survey[,4], levels = levels(May_survey[,4]),
+                      labels=paste(c(1, 10, 1280, 160, 20, 320, 40, 640, 80, 0)))
+May_survey = May_survey[!apply(May_survey, 1, function(x) any(is.na(x))),]
+May_survey = as.data.frame(apply(May_survey, 2, as.numeric))
+
+# ???
+May_survey[May_survey == 0] = 1  
+
+May_survey = log(May_survey, base=10) 
+colnames(May_survey) = c("Diasorin", "Abbott", "Roche", "Neutralization","Groundtruth")
+```
+
+**Pairs plots of serological and micro-neutralisation assays on the decadic log scale**
+
+```{r, fig.cap="Upper panels: marginal Pearson correlation; lower panels: partial Pearson correlations.  In red: correlations significant at the 5% level"}
+
+par(mfrow=c(4,4), pty="s", mar=c(2, 0, 2, 0))
+#
+with(May_survey, 
+     { hist(Neutralization, main="Neutralization", xlab="values", ylab="frequency") ;
+       rug(Neutralization) })
+with(May_survey, 
+     { plot(Neutralization~Diasorin, cex=0.5) ; abline(lm(Neutralization~Diasorin)) ;
+       #lines(lowess(Neutralization~Diasorin), col="red") 
+       corr = cor.test(Neutralization, Diasorin)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { plot(Neutralization~Abbott, cex=0.5) ; abline(lm(Neutralization~Abbott)) ;
+       #lines(lowess(Neutralization~Abbott), col="red") 
+       corr = cor.test(Neutralization, Abbott)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { plot(Neutralization~Roche, cex=0.5) ; abline(lm(Neutralization~Roche)) ;
+       #lines(lowess(Neutralization~Roche), col="red") 
+       corr = cor.test(Neutralization, Roche)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+#
+with(May_survey, 
+     { N.res = resid(lm(Neutralization~Abbott+Roche)) ;
+       D.res = resid(lm(Diasorin~Abbott+Roche)) ;
+       plot(N.res~D.res, cex=0.5) ; abline(lm(N.res~D.res)) ;
+       #lines(lowess(N.res~D.res), col="red") 
+#       corr = cor.test(N.res, D.res)
+       corr = pcor.test(Neutralization, Diasorin, cbind(Abbott, Roche))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { hist(Diasorin, main="Diasorin", xlab="values", ylab="frequency") ;
+       rug(Diasorin) })
+with(May_survey, 
+     { plot(Diasorin~Abbott, cex=0.5) ; abline(lm(Diasorin~Abbott)) ;
+       #lines(lowess(Diasorin~Abbott), col="red") 
+       corr = cor.test(Diasorin, Abbott)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { plot(Diasorin~Roche, cex=0.5) ; abline(lm(Diasorin~Roche)) ;
+       #lines(lowess(Diasorin~Roche), col="red") 
+       corr = cor.test(Diasorin, Roche)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+#
+with(May_survey, 
+     { N.res = resid(lm(Neutralization~Diasorin+Roche)) ;
+       A.res = resid(lm(Abbott~Diasorin+Roche)) ;
+       plot(N.res~A.res, cex=0.5) ; abline(lm(N.res~A.res)) ;
+       #lines(lowess(N.res~A.res), col="red") 
+#       corr = cor.test(N.res, A.res)
+       corr = pcor.test(Neutralization, Abbott, cbind(Diasorin, Roche))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { D.res = resid(lm(Diasorin~Neutralization+Roche)) ;
+       A.res = resid(lm(Abbott~Neutralization+Roche)) ;
+       plot(D.res~A.res, cex=0.5) ; abline(lm(D.res~A.res)) ;
+       #lines(lowess(D.res~A.res), col="red") 
+#       corr = cor.test(D.res, A.res)
+       corr = pcor.test(Diasorin, Abbott, cbind(Neutralization, Roche))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { hist(Abbott, main="Abbott", xlab="values", ylab="frequency") ;
+       rug(Abbott) })
+with(May_survey, 
+     { plot(Abbott~Roche, cex=0.5) ; abline(lm(Abbott~Roche)) ;
+       #lines(lowess(Abbott~Roche), col="red") 
+       corr = cor.test(Abbott, Roche)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+#
+with(May_survey, 
+     { N.res = resid(lm(Neutralization~Diasorin+Abbott)) ;
+       R.res = resid(lm(Roche~Diasorin+Abbott)) ;
+       plot(N.res~R.res, cex=0.5) ; abline(lm(N.res~R.res)) ;
+       #lines(lowess(N.res~R.res), col="red") 
+#       corr = cor.test(N.res, R.res)
+       corr = pcor.test(Neutralization, Roche, cbind(Diasorin, Abbott))       
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { D.res = resid(lm(Diasorin~Neutralization+Abbott)) ;
+       R.res = resid(lm(Roche~Neutralization+Abbott)) ;
+       plot(D.res~R.res, cex=0.5) ; abline(lm(D.res~R.res)) ;
+       #lines(lowess(D.res~R.res), col="red") 
+#       corr = cor.test(D.res, R.res)
+       corr = pcor.test(Diasorin, Roche, cbind(Neutralization, Abbott))       
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { A.res = resid(lm(Abbott~Neutralization+Diasorin)) ;
+       R.res = resid(lm(Roche~Neutralization+Diasorin)) ;
+       plot(A.res~R.res, cex=0.5) ; abline(lm(A.res~R.res)) ;
+       #lines(lowess(A.res~R.res), col="red") 
+#       corr = cor.test(A.res, R.res)
+       corr = pcor.test(Abbott, Roche, cbind(Neutralization, Diasorin))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(May_survey, 
+     { hist(Roche, main="Roche", xlab="values", ylab="frequency") ;
+       rug(Roche) })
+```
+
+**Pearson's correlations**
+
+```{r}
+cor.tab = matrix(NA, nrow=4, ncol=4)
+diag(cor.tab) = 1
+cor.tab[1,2] = with(May_survey, cor.test(Neutralization, Diasorin)$estimate)
+cor.tab[1,3] = with(May_survey, cor.test(Neutralization, Abbott)$estimate)
+cor.tab[1,4] = with(May_survey, cor.test(Neutralization, Roche)$estimate)
+cor.tab[2,1] = with(May_survey, pcor.test(Neutralization, Diasorin, cbind(Abbott, Roche))$estimate)
+cor.tab[2,3] = with(May_survey, cor.test(Diasorin, Abbott)$estimate)
+cor.tab[2,4] = with(May_survey, cor.test(Diasorin, Roche)$estimate)
+cor.tab[3,1] = with(May_survey, pcor.test(Neutralization, Abbott, cbind(Diasorin, Roche))$estimate)
+cor.tab[3,2] = with(May_survey, pcor.test(Diasorin, Abbott, cbind(Neutralization, Roche))$estimate)
+cor.tab[3,4] = with(May_survey, cor.test(Abbott, Roche)$estimate)
+cor.tab[4,1] = with(May_survey, pcor.test(Neutralization, Roche, cbind(Diasorin, Abbott))$estimate)
+cor.tab[4,2] = with(May_survey, pcor.test(Diasorin, Roche, cbind(Neutralization, Abbott))$estimate)
+cor.tab[4,3] = with(May_survey, pcor.test(Abbott, Roche, cbind(Neutralization, Diasorin))$estimate)
+cor.tab = round(cor.tab, 2)
+cor.tab = as.data.frame(cor.tab)
+dimnames(cor.tab) = list(c("Neutralization", "Diasorin","Abbott","Roche"), c("Neutralization", "Diasorin","Abbott","Roche"))
+kbl(cor.tab)
+```
+
+**p-values of Pearson's correlations**
+
+```{r}
+p.tab = matrix(NA, nrow=4, ncol=4)
+#diag(p.tab) = 1
+p.tab[1,2] = with(May_survey, cor.test(Neutralization, Diasorin)$p.value)
+p.tab[1,3] = with(May_survey, cor.test(Neutralization, Abbott)$p.value)
+p.tab[1,4] = with(May_survey, cor.test(Neutralization, Roche)$p.value)
+p.tab[2,1] = with(May_survey, pcor.test(Neutralization, Diasorin, cbind(Abbott, Roche))$p.value)
+p.tab[2,3] = with(May_survey, cor.test(Diasorin, Abbott)$p.value)
+p.tab[2,4] = with(May_survey, cor.test(Diasorin, Roche)$p.value)
+p.tab[3,1] = with(May_survey, pcor.test(Neutralization, Abbott, cbind(Diasorin, Roche))$p.value)
+p.tab[3,2] = with(May_survey, pcor.test(Diasorin, Abbott, cbind(Neutralization, Roche))$p.value)
+p.tab[3,4] = with(May_survey, cor.test(Abbott, Roche)$p.value)
+p.tab[4,1] = with(May_survey, pcor.test(Neutralization, Roche, cbind(Diasorin, Abbott))$p.value)
+p.tab[4,2] = with(May_survey, pcor.test(Diasorin, Roche, cbind(Neutralization, Abbott))$p.value)
+p.tab[4,3] = with(May_survey, pcor.test(Abbott, Roche, cbind(Neutralization, Diasorin))$p.value)
+p.tab = round(p.tab, 3)
+p.tab = as.data.frame(p.tab)
+dimnames(p.tab) = list(c("Neutralization", "Diasorin","Abbott","Roche"), c("Neutralization", "Diasorin","Abbott","Roche"))
+kbl(p.tab)
+```
+
+November serosurvey
+-------------------
+
+**Extract dataset**
+```{r}
+Nov_survey = data.frame(Vo_serology_data[,c(306,308,310,312,302)])
+Nov_survey[Nov_survey=="NA"] = NA
+Nov_survey[,4] = as.factor(Nov_survey[,4])
+Nov_survey[,4] = factor(Nov_survey[,4], levels = levels(Nov_survey[,4]),
+                      labels=paste(c(1, 640, 10, 1280, 160, 20, 320, 40, 80, 0)))
+Nov_survey = Nov_survey[!apply(Nov_survey, 1, function(x) any(is.na(x))),]
+Nov_survey = as.data.frame(apply(Nov_survey, 2, as.numeric))
+
+# ???
+Nov_survey[Nov_survey == 0] = 1
+
+Nov_survey = log(Nov_survey, base=10) 
+colnames(Nov_survey) = c("Diasorin", "Abbott", "Roche", "Neutralization")
+```
+
+**Pairs plots of serological and micro-neutralisation assays on the decadice log scale**
+
+```{r, fig.cap="Upper panels: marginal Pearson correlation; lower panels: partial Pearson correlations.  In red: correlations significant at the 5% level"}
+
+par(mfrow=c(4,4), pty="s", mar=c(2, 0, 2, 0))
+#
+with(Nov_survey, 
+     { hist(Neutralization, main="Neutralization", xlab="values", ylab="frequency") ;
+       rug(Neutralization) })
+with(Nov_survey, 
+     { plot(Neutralization~Diasorin, cex=0.5) ; abline(lm(Neutralization~Diasorin)) ;
+       #lines(lowess(Neutralization~Diasorin), col="red") 
+       corr = cor.test(Neutralization, Diasorin)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { plot(Neutralization~Abbott, cex=0.5) ; abline(lm(Neutralization~Abbott)) ;
+       #lines(lowess(Neutralization~Abbott), col="red") 
+       corr = cor.test(Neutralization, Abbott)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { plot(Neutralization~Roche, cex=0.5) ; abline(lm(Neutralization~Roche)) ;
+       #lines(lowess(Neutralization~Roche), col="red") 
+       corr = cor.test(Neutralization, Roche)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+#
+with(Nov_survey, 
+     { N.res = resid(lm(Neutralization~Abbott+Roche)) ;
+       D.res = resid(lm(Diasorin~Abbott+Roche)) ;
+       plot(N.res~D.res, cex=0.5) ; abline(lm(N.res~D.res)) ;
+       #lines(lowess(N.res~D.res), col="red") 
+#       corr = cor.test(N.res, D.res)
+       corr = pcor.test(Neutralization, Diasorin, cbind(Abbott, Roche))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { hist(Diasorin, main="Diasorin", xlab="values", ylab="frequency") ;
+       rug(Diasorin) })
+with(Nov_survey, 
+     { plot(Diasorin~Abbott, cex=0.5) ; abline(lm(Diasorin~Abbott)) ;
+       #lines(lowess(Diasorin~Abbott), col="red") 
+       corr = cor.test(Diasorin, Abbott)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { plot(Diasorin~Roche, cex=0.5) ; abline(lm(Diasorin~Roche)) ;
+       #lines(lowess(Diasorin~Roche), col="red") 
+       corr = cor.test(Diasorin, Roche)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+#
+with(Nov_survey, 
+     { N.res = resid(lm(Neutralization~Diasorin+Roche)) ;
+       A.res = resid(lm(Abbott~Diasorin+Roche)) ;
+       plot(N.res~A.res, cex=0.5) ; abline(lm(N.res~A.res)) ;
+       #lines(lowess(N.res~A.res), col="red") 
+#       corr = cor.test(N.res, A.res)
+       corr = pcor.test(Neutralization, Abbott, cbind(Diasorin, Roche))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { D.res = resid(lm(Diasorin~Neutralization+Roche)) ;
+       A.res = resid(lm(Abbott~Neutralization+Roche)) ;
+       plot(D.res~A.res, cex=0.5) ; abline(lm(D.res~A.res)) ;
+       #lines(lowess(D.res~A.res), col="red") 
+#       corr = cor.test(D.res, A.res)
+       corr = pcor.test(Diasorin, Abbott, cbind(Neutralization, Roche))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { hist(Abbott, main="Abbott", xlab="values", ylab="frequency") ;
+       rug(Abbott) })
+with(Nov_survey, 
+     { plot(Abbott~Roche, cex=0.5) ; abline(lm(Abbott~Roche)) ;
+       #lines(lowess(Abbott~Roche), col="red") 
+       corr = cor.test(Abbott, Roche)
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+#
+with(Nov_survey, 
+     { N.res = resid(lm(Neutralization~Diasorin+Abbott)) ;
+       R.res = resid(lm(Roche~Diasorin+Abbott)) ;
+       plot(N.res~R.res, cex=0.5) ; abline(lm(N.res~R.res)) ;
+       #lines(lowess(N.res~R.res), col="red") 
+#       corr = cor.test(N.res, R.res)
+       corr = pcor.test(Neutralization, Roche, cbind(Diasorin, Abbott))       
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { D.res = resid(lm(Diasorin~Neutralization+Abbott)) ;
+       R.res = resid(lm(Roche~Neutralization+Abbott)) ;
+       plot(D.res~R.res, cex=0.5) ; abline(lm(D.res~R.res)) ;
+       #lines(lowess(D.res~R.res), col="red") 
+#       corr = cor.test(D.res, R.res)
+       corr = pcor.test(Diasorin, Roche, cbind(Neutralization, Abbott))       
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { A.res = resid(lm(Abbott~Neutralization+Diasorin)) ;
+       R.res = resid(lm(Roche~Neutralization+Diasorin)) ;
+       plot(A.res~R.res, cex=0.5) ; abline(lm(A.res~R.res)) ;
+       #lines(lowess(A.res~R.res), col="red") 
+#       corr = cor.test(A.res, R.res)
+       corr = pcor.test(Abbott, Roche, cbind(Neutralization, Diasorin))
+       title(paste(round(corr$est, 2)), cex.main=2, col.main=ifelse(corr$p.v >=0.01, "black", "red"))
+       })
+with(Nov_survey, 
+     { hist(Roche, main="Roche", xlab="values", ylab="frequency") ;
+       rug(Roche) })
+```
+
+**Pearson's correlations**
+```{r}
+cor.tab = matrix(NA, nrow=4, ncol=4)
+diag(cor.tab) = 1
+cor.tab[1,2] = with(Nov_survey, cor.test(Neutralization, Diasorin)$estimate)
+cor.tab[1,3] = with(Nov_survey, cor.test(Neutralization, Abbott)$estimate)
+cor.tab[1,4] = with(Nov_survey, cor.test(Neutralization, Roche)$estimate)
+cor.tab[2,1] = with(Nov_survey, pcor.test(Neutralization, Diasorin, cbind(Abbott, Roche))$estimate)
+cor.tab[2,3] = with(Nov_survey, cor.test(Diasorin, Abbott)$estimate)
+cor.tab[2,4] = with(Nov_survey, cor.test(Diasorin, Roche)$estimate)
+cor.tab[3,1] = with(Nov_survey, pcor.test(Neutralization, Abbott, cbind(Diasorin, Roche))$estimate)
+cor.tab[3,2] = with(Nov_survey, pcor.test(Diasorin, Abbott, cbind(Neutralization, Roche))$estimate)
+cor.tab[3,4] = with(Nov_survey, cor.test(Abbott, Roche)$estimate)
+cor.tab[4,1] = with(Nov_survey, pcor.test(Neutralization, Roche, cbind(Diasorin, Abbott))$estimate)
+cor.tab[4,2] = with(Nov_survey, pcor.test(Diasorin, Roche, cbind(Neutralization, Abbott))$estimate)
+cor.tab[4,3] = with(Nov_survey, pcor.test(Abbott, Roche, cbind(Neutralization, Diasorin))$estimate)
+cor.tab = round(cor.tab, 2)
+cor.tab = as.data.frame(cor.tab)
+dimnames(cor.tab) = list(c("Neutralization", "Diasorin","Abbott","Roche"), c("Neutralization", "Diasorin","Abbott","Roche"))
+kbl(cor.tab)
+```
+
+**p-values of Pearson's correlations**
+```{r}
+p.tab = matrix(NA, nrow=4, ncol=4)
+#diag(p.tab) = 1
+p.tab[1,2] = with(Nov_survey, cor.test(Neutralization, Diasorin)$p.value)
+p.tab[1,3] = with(Nov_survey, cor.test(Neutralization, Abbott)$p.value)
+p.tab[1,4] = with(Nov_survey, cor.test(Neutralization, Roche)$p.value)
+p.tab[2,1] = with(Nov_survey, pcor.test(Neutralization, Diasorin, cbind(Abbott, Roche))$p.value)
+p.tab[2,3] = with(Nov_survey, cor.test(Diasorin, Abbott)$p.value)
+p.tab[2,4] = with(Nov_survey, cor.test(Diasorin, Roche)$p.value)
+p.tab[3,1] = with(Nov_survey, pcor.test(Neutralization, Abbott, cbind(Diasorin, Roche))$p.value)
+p.tab[3,2] = with(Nov_survey, pcor.test(Diasorin, Abbott, cbind(Neutralization, Roche))$p.value)
+p.tab[3,4] = with(Nov_survey, cor.test(Abbott, Roche)$p.value)
+p.tab[4,1] = with(Nov_survey, pcor.test(Neutralization, Roche, cbind(Diasorin, Abbott))$p.value)
+p.tab[4,2] = with(Nov_survey, pcor.test(Diasorin, Roche, cbind(Neutralization, Abbott))$p.value)
+p.tab[4,3] = with(Nov_survey, pcor.test(Abbott, Roche, cbind(Neutralization, Diasorin))$p.value)
+p.tab = round(p.tab, 3)
+p.tab = as.data.frame(p.tab)
+dimnames(p.tab) = list(c("Neutralization", "Diasorin","Abbott","Roche"), c("Neutralization", "Diasorin","Abbott","Roche"))
+kbl(p.tab)
+```
+
+
+Table S1
+========
+*Assay-specific performance against the different ground truth definitions.*
+
+Data used: May serosurvey
+
+<!-- 
+**Extract dataset**
+```{r}
+May_siero = data.frame(Vo_serology_data[,c(270,272,274,302:304)])
+tmp = May_siero[,4:6]
+tmp[tmp == 1] = "Positive"
+tmp[is.na(tmp)] = "Negative"
+May_siero[,4:6] = tmp
+May_siero[May_siero=="NA"] = NA
+
+# ???
+May_siero[May_siero=="Dubious"] = "Negative"
+
+May_siero = May_siero[!apply(May_siero, 1, function(x) any(is.na(x))),]
+```
+
+Groundtruth
+-----------
+
+**Sensitivity/specificity**
+
+*Diasorin*
+
+```{r}
+round(prop.table(table(May_siero[,c(1,4)]), 2), 4)*100
+prop.test(table(May_siero[,c(1,4)])[-1,][1,1], margin.table(table(May_siero[,c(1,4)])[-1,], 2)[1])
+prop.test(table(May_siero[,c(1,4)])[-1,][2,2], margin.table(table(May_siero[,c(1,4)])[-1,], 2)[2])
+```
+
+*Abbott*
+
+```{r}
+round(prop.table(table(May_siero[,c(2,4)]), 2), 4)*100
+prop.test(table(May_siero[,c(2,4)])[1,1], margin.table(table(May_siero[,c(2,4)]), 2)[1])
+prop.test(table(May_siero[,c(2,4)])[2,2], margin.table(table(May_siero[,c(2,4)]), 2)[2])
+```
+
+*Roche*
+
+```{r}
+round(prop.table(table(May_siero[,c(3,4)]), 2), 4)*100
+prop.test(table(May_siero[,c(3,4)])[1,1], margin.table(table(May_siero[,c(3,4)]), 2)[1])
+prop.test(table(May_siero[,c(3,4)])[2,2], margin.table(table(May_siero[,c(3,4)]), 2)[2])
+```
+
+**PPV/NPV**
+
+*Diasorin*
+
+```{r}
+round(prop.table(table(May_siero[,c(1,4)]), 1), 4)*100
+prop.test(table(May_siero[,c(1,4)])[-1,][1,1], margin.table(table(May_siero[,c(1,4)])[-1,], 1)[1])
+prop.test(table(May_siero[,c(1,4)])[-1,][2,2], margin.table(table(May_siero[,c(1,4)])[-1,], 1)[2])
+```
+
+*Abbott*
+
+```{r}
+round(prop.table(table(May_siero[,c(2,4)]), 1), 4)*100
+prop.test(table(May_siero[,c(2,4)])[1,1], margin.table(table(May_siero[,c(2,4)]), 1)[1])
+prop.test(table(May_siero[,c(2,4)])[2,2], margin.table(table(May_siero[,c(2,4)]), 1)[2])
+```
+
+*Roche*
+
+```{r}
+round(prop.table(table(May_siero[,c(3,4)]), 1), 4)*100
+prop.test(table(May_siero[,c(3,4)])[1,1], margin.table(table(May_siero[,c(3,4)]), 1)[1])
+prop.test(table(May_siero[,c(3,4)])[2,2], margin.table(table(May_siero[,c(3,4)]), 1)[2])
+```
+
+Groundtruth direct contacts
+---------------------------
+
+**Sensitivity/specificity**
+
+*Diasorin*
+
+```{r}
+round(prop.table(table(May_siero[,c(1,5)]), 2), 4)*100
+prop.test(table(May_siero[,c(1,5)])[-1,][1,1], margin.table(table(May_siero[,c(1,5)])[-1,], 2)[1])
+prop.test(table(May_siero[,c(1,5)])[-1,][2,2], margin.table(table(May_siero[,c(1,5)])[-1,], 2)[2])
+```
+
+*Abbott*
+
+```{r}
+round(prop.table(table(May_siero[,c(2,5)]), 2), 4)*100
+prop.test(table(May_siero[,c(2,5)])[1,1], margin.table(table(May_siero[,c(2,5)]), 2)[1])
+prop.test(table(May_siero[,c(2,5)])[2,2], margin.table(table(May_siero[,c(2,5)]), 2)[2])
+```
+
+*Roche*
+
+```{r}
+round(prop.table(table(May_siero[,c(3,5)]), 2), 4)*100
+prop.test(table(May_siero[,c(3,5)])[1,1], margin.table(table(May_siero[,c(3,5)]), 2)[1])
+prop.test(table(May_siero[,c(3,5)])[2,2], margin.table(table(May_siero[,c(3,5)]), 2)[2])
+```
+
+**PPV/NPV**
+
+*Diasorin*
+
+```{r}
+round(prop.table(table(May_siero[,c(1,5)]), 1), 4)*100
+prop.test(table(May_siero[,c(1,5)])[-1,][1,1], margin.table(table(May_siero[,c(1,5)])[-1,], 1)[1])
+prop.test(table(May_siero[,c(1,5)])[-1,][2,2], margin.table(table(May_siero[,c(1,5)])[-1,], 1)[2])
+```
+
+*Abbott*
+
+```{r}
+round(prop.table(table(May_siero[,c(2,5)]), 1), 4)*100
+prop.test(table(May_siero[,c(2,5)])[1,1], margin.table(table(May_siero[,c(2,5)]), 1)[1])
+prop.test(table(May_siero[,c(2,5)])[2,2], margin.table(table(May_siero[,c(2,5)]), 1)[2])
+```
+
+*Roche*
+
+```{r}
+round(prop.table(table(May_siero[,c(3,5)]), 1), 4)*100
+prop.test(table(May_siero[,c(3,5)])[1,1], margin.table(table(May_siero[,c(3,5)]), 1)[1])
+prop.test(table(May_siero[,c(3,5)])[2,2], margin.table(table(May_siero[,c(3,5)]), 1)[2])
+```
+
+Groundtruth indirect contacts
+-----------------------------
+
+**Sensitivity/specificity**
+
+*Diasorin*
+
+```{r}
+round(prop.table(table(May_siero[,c(1,6)]), 2), 4)*100
+prop.test(table(May_siero[,c(1,6)])[-1,][1,1], margin.table(table(May_siero[,c(1,6)])[-1,], 2)[1])
+prop.test(table(May_siero[,c(1,6)])[-1,][2,2], margin.table(table(May_siero[,c(1,6)])[-1,], 2)[2])
+```
+
+*Abbott*
+
+```{r}
+round(prop.table(table(May_siero[,c(2,6)]), 2), 4)*100
+prop.test(table(May_siero[,c(2,6)])[1,1], margin.table(table(May_siero[,c(2,6)]), 2)[1])
+prop.test(table(May_siero[,c(2,6)])[2,2], margin.table(table(May_siero[,c(2,6)]), 2)[2])
+```
+
+*Roche*
+
+```{r}
+round(prop.table(table(May_siero[,c(3,6)]), 2), 4)*100
+prop.test(table(May_siero[,c(3,6)])[1,1], margin.table(table(May_siero[,c(3,6)]), 2)[1])
+prop.test(table(May_siero[,c(3,6)])[2,2], margin.table(table(May_siero[,c(3,6)]), 2)[2])
+```
+
+**PPV/NPV**
+
+*Diasorin*
+
+```{r}
+round(prop.table(table(May_siero[,c(1,6)]), 1), 4)*100
+prop.test(table(May_siero[,c(1,6)])[-1,][1,1], margin.table(table(May_siero[,c(1,6)])[-1,], 1)[1])
+prop.test(table(May_siero[,c(1,6)])[-1,][2,2], margin.table(table(May_siero[,c(1,6)])[-1,], 1)[2])
+```
+
+*Abbott*
+
+```{r}
+round(prop.table(table(May_siero[,c(2,6)]), 1), 4)*100
+prop.test(table(May_siero[,c(2,6)])[1,1], margin.table(table(May_siero[,c(2,6)]), 1)[1])
+prop.test(table(May_siero[,c(2,6)])[2,2], margin.table(table(May_siero[,c(2,6)]), 1)[2])
+```
+
+*Roche*
+
+```{r}
+round(prop.table(table(May_siero[,c(3,6)]), 1), 4)*100
+prop.test(table(May_siero[,c(3,6)])[1,1], margin.table(table(May_siero[,c(3,6)]), 1)[1])
+prop.test(table(May_siero[,c(3,6)])[2,2], margin.table(table(May_siero[,c(3,6)]), 1)[2])
+```
+-->
+
+Table S5
+========
+
+*Frequency of comorbidities in symptomatic and asymptomatic SARS-CoV-2 infected individuals*
+
+**Extract datasets**
+```{r}
+which_symptomatic = 12
+which_comorbidity = 280:287
+which_groundtruth = 302:304
+
+comorbidities = Vo_serology_data[,c(which_symptomatic, which_comorbidity, which_groundtruth)]
+```
+
+Groundtruth
+-----------
+```{r, warning=FALSE}
+comorb_gt = comorbidities[!is.na(comorbidities[,10]),]
+dim(comorb_gt)
+
+tmp = comorb_gt[,1]
+tmp[!is.na(tmp)] = "symptomatic"
+tmp[is.na(tmp)] = "asymptomatic"
+comorb_gt[,1] = tmp
+#
+tmp = as.matrix(comorb_gt[,c(2:9)])
+tmp[is.na(tmp)] = "absent"
+tmp[tmp == "1"] = "present"
+comorb_gt[,c(2:9)] = tmp
+```
+
+```{r, warning=FALSE}
+for(idx in c(2:6, 8:9))
+{
+print(table(comorb_gt[,c(idx,1)]))
+print(fisher.test(table(comorb_gt[,c(idx,1)])))
+}
+```
+
+Groundtruth direct contacts
+---------------------------
+```{r, warning=FALSE}
+comorb_gtdc = comorbidities[!is.na(comorbidities[,11]),]
+dim(comorb_gtdc)
+
+tmp = comorb_gtdc[,1]
+tmp[!is.na(tmp)] = "symptomatic"
+tmp[is.na(tmp)] = "asymptomatic"
+comorb_gtdc[,1] = tmp
+#
+tmp = as.matrix(comorb_gtdc[,c(2:9)])
+tmp[is.na(tmp)] = "absent"
+tmp[tmp == "1"] = "present"
+comorb_gtdc[,c(2:9)] = tmp
+```
+
+```{r}
+for(idx in c(2:6, 8:9))
+{
+print(table(comorb_gtdc[,c(idx,1)]))
+print(fisher.test(table(comorb_gtdc[,c(idx,1)])))
+}
+```
+
+Groundtruth indirect contacts
+-----------------------------
+```{r}
+comorb_gtic = comorbidities[!is.na(comorbidities[,12]),]
+dim(comorb_gtic)
+
+tmp = comorb_gtic[,1]
+tmp[!is.na(tmp)] = "symptomatic"
+tmp[is.na(tmp)] = "asymptomatic"
+comorb_gtic[,1] = tmp
+#
+tmp = as.matrix(comorb_gtic[,c(2:9)])
+tmp[is.na(tmp)] = "absent"
+tmp[tmp == "1"] = "present"
+comorb_gtic[,c(2:9)] = tmp
+```
+
+```{r}
+for(idx in c(2:6, 8:9))
+{
+print(table(comorb_gtic[,c(idx,1)]))
+print(fisher.test(table(comorb_gtic[,c(idx,1)])))
+}
+```
+
+
+Table S6
+========
+
+*Frequency of medication type in symptomatic and asymptomatic SARS-Cov-2 infected individuals*
+
+**Extract datasets**
+```{r}
+which_symptomatic = 12
+which_medication = 288:301
+which_groundtruth = 302:304
+
+medications = Vo_serology_data[,c(which_symptomatic, which_medication, which_groundtruth)]
+```
+
+Groundtruth
+-----------
+```{r, warning=FALSE}
+medic_gt = medications[!is.na(medications[,16]),]
+dim(medic_gt)
+
+tmp = medic_gt[,1]
+tmp[!is.na(tmp)] = "symptomatic"
+tmp[is.na(tmp)] = "asymptomatic"
+medic_gt[,1] = tmp
+#
+tmp = as.matrix(medic_gt[,c(2:15)])
+tmp[is.na(tmp)] = "absent"
+tmp[tmp == "1"] = "present"
+tmp[tmp == " 1"] = "present"
+medic_gt[,c(2:15)] = tmp
+```
+
+```{r}
+for(idx in c(2:15))
+{
+print(table(medic_gt[,c(idx,1)]))
+print(fisher.test(table(medic_gt[,c(idx,1)])))
+}
+```
+
+Groundtruth direct contacts
+---------------------------
+```{r, warning=FALSE}
+medic_gtdc = medications[!is.na(medications[,17]),]
+dim(medic_gtdc)
+
+tmp = medic_gtdc[,1]
+tmp[!is.na(tmp)] = "symptomatic"
+tmp[is.na(tmp)] = "asymptomatic"
+medic_gtdc[,1] = tmp
+#
+tmp = as.matrix(medic_gtdc[,c(2:15)])
+tmp[is.na(tmp)] = "absent"
+tmp[tmp == "1"] = "present"
+medic_gtdc[,c(2:15)] = tmp
+```
+
+```{r}
+for(idx in c(2:15))
+{
+print(table(medic_gtdc[,c(idx,1)]))
+print(fisher.test(table(medic_gtdc[,c(idx,1)])))
+}
+```
+
+Groundtruth indirect contacts
+-----------------------------
+```{r, warning=FALSE}
+medic_gtic = medications[!is.na(medications[,18]),]
+dim(medic_gtic)
+
+tmp = medic_gtic[,1]
+tmp[!is.na(tmp)] = "symptomatic"
+tmp[is.na(tmp)] = "asymptomatic"
+medic_gtic[,1] = tmp
+#
+tmp = as.matrix(medic_gtic[,c(2:15)])
+tmp[is.na(tmp)] = "absent"
+tmp[tmp == "1"] = "present"
+medic_gtic[,c(2:15)] = tmp
+```
+
+```{r}
+for(idx in c(2:15))
+{
+print(table(medic_gtic[,c(idx,1)]))
+print(fisher.test(table(medic_gtic[,c(idx,1)])))
+}
+```
