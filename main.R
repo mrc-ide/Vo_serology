@@ -72,7 +72,9 @@ source("scripts/Plot_SITP_overdisp_fit_original_model_script_10.R")
 # N.B. uncomment lines 45-48 for a quicker test run
 source("scripts/Impact_of_contact_tracing_11.R")
 
-# Produces Figure S1, Tables S1, S5, S6
-rmarkdown::render("scripts/Complementary_info_Figure_S1_Tables_S5_S6.Rmd",
+# Produces Figure S1, Tables S5 and S6
+rmarkdown::render("scripts/Complementary_SI_info_12.Rmd",
                   knit_root_dir = getwd(),
                   output_dir = "figures")
+
+source("scripts/Neutralization_decay_script_13.R")

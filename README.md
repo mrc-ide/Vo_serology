@@ -37,6 +37,8 @@ The scripts folder contains the main scripts for each separate analysis
 - `Plot_DIC_script_9.R` is the main script to compare the performance of the original, extended and 2-groups within-household transmission models. This script requires scripts 6, 7 and 8 to be run beforehand. 
 - `Plot_SITP_overdisp_fit_original_model_script_10.R` is the main script to output the model fit, the SITP and the overdispersionin the offspring distribution of the best model. This script requires script 6 to be run beforehand. 
 - `Impact_of_contact_tracing_11.R` is the main script to compute the impact of contact tracing on the spread of COVID-19 in Vo' in spring 2020. Under the hood, this script runs a SEIR model that has previously been published (Lavezzo et. al., 2020, Suppression of COVID-19 outbreak in the municipality of Vo, Italy, medRxiv, doi: 10.1101/2020.04.17.20053157). This script is independent of all other scripts.
+- `Complementary_SI_info_12.Rmd` computes complementary info for Figures S1, and Tables S5 and S6.
+- `Neutralization_decay_script_13.R` is the main script that calculates the halflife of neutralising antibodies observed between May and November, considering only subjects who were positive in May and not increasing between May and November.
 
 
 ## R 
