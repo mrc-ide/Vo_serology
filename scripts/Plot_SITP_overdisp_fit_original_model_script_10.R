@@ -328,6 +328,7 @@ for(i in 2:dim(data)[2]){
 # expected attack rates
 AR_mat <- matrix(0, ncol = dim(data)[2], nrow = N)
 SAR_mat <- matrix(0, ncol = dim(data)[2], nrow = N)
+SAR_mat_num <- matrix(0, ncol = dim(data)[2], nrow = N)
 
 for(j in 1:N){
 
@@ -340,6 +341,9 @@ for(j in 1:N){
     tmp <- (as.numeric(rownames(data))-1)*dataexp[,i]
     SAR_mat[j,i] <- sum(tmp[2:length(tmp)])/
       ((as.numeric(colnames(data))-1)[i]*sum(dataexp[2:length(tmp),i]))
+    
+    SAR_mat_num[j,i] <- sum(tmp[2:length(tmp)])
+    
   }
 }
 
@@ -392,6 +396,28 @@ plot_AR_final <- ggplot(df_AR_final)+
                 position = position_dodge(0.7))+
   xlab("household size")+
   ylab("attack rate (%)")+
+  theme_bw()+
+  theme(legend.position = c(0.28, 0.78),
+        legend.title = element_blank(),
+        legend.key = element_rect(colour = "transparent"),
+        legend.background = element_blank())
+
+
+df_AR_final_num <- data.frame(value = c(NA,apply(SAR_mat_num, 2, mean)[-1]),
+                              low = c(NA, apply(SAR_mat_num, 2, quantile, 0.025)[-1]),
+                              up = c(NA, apply(SAR_mat_num, 2, quantile, 0.975)[-1]),
+                              size = as.factor(rep(seq(1,7,1), 6)))
+
+plot_AR_final_num <- ggplot(df_AR_final_num)+
+  geom_point(aes(x = size,
+                 y = value),
+             shape = 15)+
+  geom_errorbar(aes(x = size,
+                    ymin = low,
+                    ymax = up),
+                width= 0)+
+  xlab("household size")+
+  ylab("secondary infections")+
   theme_bw()+
   theme(legend.position = c(0.32, 0.80),
         legend.title = element_blank(),
@@ -727,9 +753,17 @@ top_row <- plot_grid(plot_SITP_final,
                      ncol=1,
                      label_fontface = "bold")
 
+col2 <- plot_grid(plot_AR_final,
+                  plot_AR_final_num,
+                  labels = c('b', 'd'),
+                  rel_heights = c(2,1),
+                  label_size = 8,
+                  ncol = 1,
+                  label_fontface = "bold")
+
 p_final <- plot_grid(top_row,
-                     plot_AR_final,
-                     labels = c('', 'b'),
+                     col2,
+                     labels = c('', ''),
                      label_size = 8,
                      ncol = 2,
                      label_fontface = "bold")
@@ -740,7 +774,7 @@ ggsave(filename =
                   "Figure_4.tiff"),
       plot = p_final,
       device = "tiff",
-      width = 240, height = 120,
+      width = 240, height = 140,
       units = "mm", dpi = 300, limitsize = TRUE)
 # -----------------------------------------------------------------------------#
 

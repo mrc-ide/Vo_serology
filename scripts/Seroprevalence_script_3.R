@@ -238,7 +238,7 @@ q <- ggplot(df_GT)+ylim(0.0095, 0.085)+
   theme_bw() +
   theme(legend.position = "none",
         legend.text = element_text(size=10),
-        )+xlab("")+ylab("proportion population infected")
+        )+xlab("")+ylab("seroprevalence")
 
 # Estimate assay performance with respect to the different GT defintions
 # Supplementary Table S1
@@ -395,7 +395,7 @@ p_serop_adj_def <- ggplot(df_serop_adj_def)+ylim(0.0095, 0.085)+
   )
 
 # Figure 2 -------------------------------------------------------------------#
-row1 <- plot_grid(q, p_adj, p_serop_adj_def,
+row1 <- plot_grid(p_adj, q, p_serop_adj_def,
                   labels = c('a', 'b', 'c'),
                   label_size = 8, ncol = 3,
                   label_fontface = "bold")
