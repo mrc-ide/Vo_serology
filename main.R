@@ -32,7 +32,7 @@ library(stringr)
 library(tidyr)
 library(wesanderson)
 library(rmdformats)
-
+library(viridis)
 
 # Run scripts -----------------------------------------------------------------#
 
@@ -44,8 +44,8 @@ source("scripts/Seroprevalence_script_3.R")
 
 source("scripts/Association_antibody_titres_script_4.R")
 
-# N.B. make sure to run step 4 before this step, as this script uses the output
-# from this script
+# N.B. make sure to run step 4 before running step 5, as script 5 uses the 
+# output of script 4
 source("scripts/Association_antibody_decay_script_5.R")
 
 # N.B. this script takes time to run,

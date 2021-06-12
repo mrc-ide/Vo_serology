@@ -29,6 +29,13 @@ path_table <- file.path(getwd(), "tables")
 # formatting ------------------------------------------------------------------#
 levels(ds$hospitalized)[levels(ds$hospitalized)==""] <- "no"
 
+ds$Symptomatic_any_time_from_1_january_to_1_may <- 
+  as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may)
+
+levels(ds$Symptomatic_any_time_from_1_january_to_1_may)[
+  levels(ds$Symptomatic_any_time_from_1_january_to_1_may)==""] <- "no"
+
+
 # BMI
 ds$BMI <- ds$Weight_kg/(ds$Height_cm/100)^2
 
@@ -105,12 +112,12 @@ plot2 <- ggplot(data = df2)+
   ylab("probability of being symptomatic")+
   xlab("BMI category")
 
-
+if(!is.factor(ds$age_group)) ds$age_group <- as.factor(ds$age_group)
 ds$age_group <- relevel(ds$age_group, ref = "51-60")
 ds$BMI_category <- relevel(ds$BMI_category, ref = "Normal")
 
 # logistic regression symptoms ~ age
-res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ age_group,
+res <- glm(Symptomatic_any_time_from_1_january_to_1_may ~ age_group, 
            data = ds, family = "binomial")
 summary(res)
 confint(res)

@@ -339,7 +339,7 @@ col3 <- plot_grid(p1, p2, p3,
           nrow = 1,
           label_fontface = "bold")
 
-ggsave(filename = file.path(path_figure, "Figure_S2.tiff"),
+ggsave(filename = file.path(path_figure, "Figure_4.tiff"),
        plot = plot_grid(cols12, col3,
                         labels = c('', ''),
                         label_size = 8,
@@ -347,7 +347,18 @@ ggsave(filename = file.path(path_figure, "Figure_S2.tiff"),
                         rel_heights = c(2,1),
                         label_fontface = "bold"),
        device = "tiff",
-       width = 300, height = 270,
+       width = 180, height = 180,
+       units = "mm", dpi = 300, limitsize = TRUE)
+
+ggsave(filename = file.path(path_figure, "Figure_4.eps"),
+       plot = plot_grid(cols12, col3,
+                        labels = c('', ''),
+                        label_size = 8,
+                        ncol = 1,
+                        rel_heights = c(2,1),
+                        label_fontface = "bold"),
+       device = "eps",
+       width = 180, height = 180,
        units = "mm", dpi = 300, limitsize = TRUE)
 # -----------------------------------------------------------------------------#
 

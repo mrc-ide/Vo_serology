@@ -156,10 +156,12 @@ p_adj <- ggplot(df_serop)+ylim(0.0095, 0.085)+
                 position = position_dodge(0.5))+
   xlab("")+
   theme_bw()+
-  theme(legend.position = c(0.45, 0.90),
+  theme(text = element_text(size=9),
+        legend.position = c(0.45, 0.90),
+        legend.key.height=unit(0.5,"line"),
         legend.box = "horizontal",
         legend.title = element_blank(),
-        legend.text = element_text(size=10),
+        legend.text = element_text(size=6),
         legend.key = element_rect(colour = "transparent",
                                   fill = "transparent"),
         legend.background = element_rect(colour ="transparent",
@@ -209,9 +211,9 @@ df_GT <- data.frame(seroprevalence = c(confint_GT1$mean,
                                        confint_GT2$mean,
                                        confint_GT3$mean),
 
-                    definition = c("GT baseline",
-                                   "GT direct\ncontacts",
-                                   "GT indirect\ncontacts"),
+                    definition = c("GT\nbaseline",
+                                   "GT\ndirect",
+                                   "GT\nindirect"),
 
                      lower_CI = c(confint_GT1$lower,
                                   confint_GT2$lower,
@@ -236,8 +238,8 @@ q <- ggplot(df_GT)+ylim(0.0095, 0.085)+
                 width = 0.2,
                 position = position_dodge(0.9))+
   theme_bw() +
-  theme(legend.position = "none",
-        legend.text = element_text(size=10),
+  theme(text = element_text(size=9),
+        legend.position = "none",
         )+xlab("")+ylab("seroprevalence")
 
 # Estimate assay performance with respect to the different GT defintions
@@ -384,15 +386,16 @@ p_serop_adj_def <- ggplot(df_serop_adj_def)+ylim(0.0095, 0.085)+
                 position = position_dodge(0.5))+
   xlab("")+ ylab("seroprevalence")+
   theme_bw()+
-  theme(legend.position = c(0.30, 0.85),
+  theme(text = element_text(size=9),
+        legend.key.height=unit(0.5,"line"),
+        legend.position = c(0.30, 0.90),
         legend.box = "horizontal",
         legend.title = element_blank(),
-        legend.text = element_text(size=10),
+        legend.text = element_text(size=6),
         legend.key = element_rect(colour = "transparent",
                                   fill = "transparent"),
         legend.background = element_rect(colour ="transparent",
-                                         fill = "transparent")
-  )
+                                         fill = "transparent"))
 
 # Figure 2 -------------------------------------------------------------------#
 row1 <- plot_grid(p_adj, q, p_serop_adj_def,
@@ -400,10 +403,16 @@ row1 <- plot_grid(p_adj, q, p_serop_adj_def,
                   label_size = 8, ncol = 3,
                   label_fontface = "bold")
 
+ ggsave(filename = file.path(path_figure, "Figure_2.eps"),
+        plot = row1,
+        device = "eps",
+        width = 180, height = 60,
+        units = "mm", dpi = 300, limitsize = TRUE)
+ 
  ggsave(filename = file.path(path_figure, "Figure_2.tiff"),
         plot = row1,
         device = "tiff",
-        width = 270, height = 90,
+        width = 180, height = 60,
         units = "mm", dpi = 300, limitsize = TRUE)
 # -----------------------------------------------------------------------------#
 

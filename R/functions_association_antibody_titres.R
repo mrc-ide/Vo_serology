@@ -344,23 +344,21 @@ Anova_Kruskal_antibody_titres <- function(var_qual, var_quant, type){
                       y = antibody_titres,
                       fill = type))+
     geom_boxplot()+
-    ylab(paste(paste(paste(paste("Antibody titres", month, sep = " "),
-               "(", sep = " "), 
-               out, sep= ""), ")", sep=""))+ 
+    scale_fill_viridis(discrete = TRUE) + #alpha=0.6
+    geom_jitter(color="black", size=0.4) + #alpha=0.9
+    ylab(paste("Ab titres", out, sep=""))+ 
     xlab(xlab)+
     stat_summary(
       fun.data = stat_box_data, 
       geom = "text", 
       hjust = 0.5,
-      vjust = 0.9,
-      size = 3) +
+      vjust = 0.5,
+      size = 2) +
     theme_bw()+
-    theme(legend.position = "none")
-  
-  if(type == "age group"){
-    t <- t +
-    theme(axis.text.x = element_text(angle = 30))
-  }
+    theme(axis.text.x = element_text(angle = 45, size = 8, vjust = 1, hjust = 1), #vjust = 0.5, hjust=1
+          axis.text.y = element_text(size = 8),
+          axis.title=element_text(size=8),
+          legend.position = "none")
   
   # test normality of the data 
   normality <- 1

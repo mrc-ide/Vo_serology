@@ -187,7 +187,7 @@ s <- ggplot() +
   geom_bar(data = df2,
            aes(x = as.factor(size), fill = as.factor(pos)),
            position = position_fill(reverse = TRUE))+
-  scale_fill_manual(values = wes_palette("Zissou1", n = 5))+
+  scale_fill_manual(values = wesanderson::wes_palette("Zissou1", n = 5))+
   theme(legend.position = "bottom")+
   xlab("household size")+
   ylab("proportion")+
@@ -210,7 +210,7 @@ t <-s +
         axis.text.y.right = element_text(color = "dodgerblue4"))
 
 # ------------------------------ Figure S3 ------------------------------------#
-ggsave(filename = file.path(dir_figures, "Figure_S3.tiff"),
+ggsave(filename = file.path(dir_figures, "Figure_S2.tiff"),
         plot = plot_grid(plot_grid(p, t,
                  labels = c('a', 'b'),
                  label_size = 8,
