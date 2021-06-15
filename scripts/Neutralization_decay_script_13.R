@@ -104,5 +104,5 @@ for(idx in 1:4999)
 
 cat("Median = ", median(HL_N.sim), "\n")
 
-cat("95% CI : ", quantile(HL_N.sim, c(0.025, 0.975)))
+cat("95% CI : ", quantile(HL_N.sim, c(0.025, 0.975)), "\n")
 
