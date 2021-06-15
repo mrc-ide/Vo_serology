@@ -62,9 +62,11 @@ ds$BMI_category <- factor(ds$BMI_category, levels= c("Underweight",
                                                      "Obese",
                                                      "NA"))
 
+ds$Symptomatic_any_time_from_1_january_to_1_may <- 
+  as.factor(ds$Symptomatic_any_time_from_1_january_to_1_may)
+
 levels(ds$Symptomatic_any_time_from_1_january_to_1_may)[
   levels(ds$Symptomatic_any_time_from_1_january_to_1_may) == ""] <- "no"
-
 
 # select baseline groud truth
 ds <- ds[which(ds$Groundtruth == 1), ]
